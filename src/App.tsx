@@ -10,21 +10,25 @@ import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
 import { styled } from "styled-components";
+import ProtectedRoute from "./components/protected-route";
 
 
 
 const router = createBrowserRouter([
   {
     path:"/",
-    element: <Layout  />, //layout component 내부에서 render中
+    element: <ProtectedRoute>
+                <Layout/>
+             </ProtectedRoute>,       //layout component 내부에서 render中
+                                 
     children: [
       {
         path: "",
-        element: <Home/>,
+        element: <Home/>
       },
       {
         path: "profile",
-        element: <Profile/>,
+        element: <Profile/>
       }
       ],
     },
@@ -59,9 +63,6 @@ const Wrapper = styled.div`
   justify-content: center;
 
 `;
-
-
-
 
 
 //firebase의 동작 방식: Firebase SDK와 Firebase server--> authentication(cookie, token ... check with the server)

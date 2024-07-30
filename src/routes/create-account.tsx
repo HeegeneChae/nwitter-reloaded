@@ -1,9 +1,16 @@
 //REQ: account관련 route들은 layout에 포함 안되게 해주세요 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
+// import React from "react";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
+//import {Switcher} from "react-switcher-component";
+
+
+// const errors = {
+//     "auth/email-already-in-use": "That email already exists."
 
 const Wrapper = styled.div`
     height:100%;
@@ -20,6 +27,7 @@ const Title = styled.h1`
 
 const Form = styled.form`
     margin-top: 50px;
+    margin-bottom: 10px;
     display: flex; 
     flex-direction: column; 
     gap: 10px; 
@@ -41,6 +49,18 @@ const Input = styled.input`
     ;
 
 `;
+const Error = styled.span`
+        font-weight: 600;
+        color: tomato;
+    `;
+
+const Switcher = styled.span`
+    margin-top: 20px;
+  a {
+    color: #1d9bf0;
+  }
+`;
+
 //바뀌는 값에 대해서 알 수 있다
 export default function CreateAccount() {
     const navigate  = useNavigate();
@@ -64,6 +84,7 @@ export default function CreateAccount() {
     };
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
+        setError("");
         if(isLoading || name=== "" || email === ""  || password ===""  )
             return;
         try{
@@ -83,20 +104,21 @@ export default function CreateAccount() {
         }); 
         //redirect to the home page
             navigate("/");
-        } catch(e){
+        } catch(e){ 
             //set error 
+            console.log(e);
+            if (e instanceof FirebaseError ){
+                console.log(e.code, e.message);
+                setError(e.message);
 
-
-
+            }
         } finally{
             setLoading(false);
         }
         console.log(name, email, password);
     };
-    const Error = styled.span`
-        font-weight: 600;
-        color: tomato;
-    `;
+    
+    
 
     return (
      <Wrapper>
@@ -128,6 +150,9 @@ export default function CreateAccount() {
         </Form>
 
         {error !== "" ? <Error>{error}</Error> : null}
+        <Switcher>
+            Already have an account? <Link to="/login">Log in &rarr;</Link>
+        </Switcher>
         </Wrapper>
        );
 }
